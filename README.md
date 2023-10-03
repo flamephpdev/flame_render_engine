@@ -3,7 +3,7 @@
 Just add it to your projects root directory, and
 require the app.php like: 
 ```php
-require_once __DIR__ . '/flame_renderer_engine/app.php';
+require_once __DIR__ . '/flame_render_engine/app.php';
 ```
 
 # How to use it?
