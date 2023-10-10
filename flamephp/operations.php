@@ -166,7 +166,7 @@ class FlameOperations extends Base {
                               $php_syntax_endTag = "<?php " . substr($endTagName, 1) . " ?>";
                               $__default_content_editable = str_replace($endTagName, $php_syntax_endTag, $__default_content_editable);
                          }
-                    } else $__default_content_editable = rem_inx($__default_content_editable, $__currentPos - strlen($_created) - 1);
+                    } else $__default_content_editable = flamephp_rem_inx($__default_content_editable, $__currentPos - strlen($_created) - 1);
                     
                }
           }

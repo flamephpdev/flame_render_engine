@@ -30,21 +30,48 @@ function flamephp_createPath__($path) {
     return ($return && is_writable($prev_path)) ? mkdir($path) : false;
 }
 
-function cache($cache) {
-    return FLAMEPHP_RENDER_ENGINE_ROOT . '/__fphp__cache__' . startStrSlash($cache);
+function flamephp_cache($cache) {
+    return FLAMEPHP_RENDER_ENGINE_ROOT . '/__fphp__cache__' . flamephp_startStrSlash($cache);
 }
 
-function startStrSlash($str) {
+function flamephp_startStrSlash($str) {
     if(!str_starts_with($str, '/')) return '/' . $str;
     return $str;
 }
 
 //get string between
-function string_between($string, $start, $end){
+function flamephp_string_between($string, $start, $end){
     $string = ' ' . $string;
     $ini = strpos($string, $start);
     if ($ini == 0) return '';
     $ini += strlen($start);
     $len = strpos($string, $end, $ini) - $ini;
     return substr($string, $ini, $len);
+}
+
+function flamephp_str_replace_first($search, $replace, $subject){
+    $search = '/'.preg_quote($search, '/').'/';
+    return preg_replace($search, $replace, $subject, 1);
+}
+
+function flamephp_rem_inx ($s, $n){ 
+    return substr($s,0,$n).substr($s,$n+1,strlen($s)-$n);
+}
+
+function flamephp_deleteDir($dirPath) {
+    if (!is_dir($dirPath)) {
+        throw new InvalidArgumentException("$dirPath must be a directory");
+    }
+    if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+        $dirPath .= '/';
+    }
+    $files = glob($dirPath . '*', GLOB_MARK);
+    foreach ($files as $file) {
+        if (is_dir($file)) {
+            flamephp_deleteDir($file);
+        } else {
+            unlink($file);
+        }
+    }
+    rmdir($dirPath);
 }

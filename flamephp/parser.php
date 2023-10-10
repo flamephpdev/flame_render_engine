@@ -7,7 +7,7 @@ class FlameParser {
      public static function parse($data, $start_tag, $end_tag,?array $nsw = NULL) {
           $arr = [];
           while(1){
-               $parsed = string_between($data, $start_tag, $end_tag);
+               $parsed = flamephp_string_between($data, $start_tag, $end_tag);
                if(!$parsed)
                     break;
                $np_poz = strpos($data, $start_tag)-1;
@@ -21,7 +21,7 @@ class FlameParser {
                          array_push($arr,$parsed);
                     }
                } else {
-                    $data = rem_inx($data,$np_poz);
+                    $data = flamephp_rem_inx($data,$np_poz);
                }
                $nextString = substr($data, $strposition+1, strlen($data));
                $data = $nextString;
@@ -43,9 +43,9 @@ class FlameParser {
                     while(str_contains($data,$r)){
                          $np_poz = strpos($data, $r)-1;
                          if(substr($data, $np_poz, 1) != '#'){
-                              $data = str_replace_first($r,'<?php ' . $rto . ' ?>',$data);
+                              $data = flamephp_str_replace_first($r,'<?php ' . $rto . ' ?>',$data);
                          } else {
-                              $data = rem_inx($data,$np_poz);
+                              $data = flamephp_rem_inx($data,$np_poz);
                          }
                     }
                }

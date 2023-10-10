@@ -9,14 +9,14 @@ class FlameRender extends Base {
 
      public static $store_dir = FLAMEPHP_RENDER_ENGINE_ROOT . '/__fphp__cache__/views';
      private static $ez_tags = [ '{{', '}}', '*', '!', '--' ];
-     public static $views_dir = FLAMEPHP_RENDER_ENGINE_ROOT . '/views';
+     public static $views_dir = FLAMEPHP_VIEWS_FOLDER;
      private static $view__autorender_file = '.view.{ext}';
      private static array $custom_replace = [];
 
      public static function boot():void {
           $config = array(
                // the folder where the dev views stored
-               'view-folder' => FLAMEPHP_RENDER_ENGINE_ROOT . '/views',
+               'view-folder' => FLAMEPHP_VIEWS_FOLDER,
            
                // ez tags for easier writing, usage: {{ asset('css/main.css') }} // returns the main css url
                'ez-tags' => array(
@@ -32,7 +32,7 @@ class FlameRender extends Base {
                'replace-tags-to' => array(
                    '@else:' => 'else:',
                    '@CSRF' => 'echo \Core\App\Security\Csrf::tokenInput()',
-                   '@dev' => 'if(MODE_DEV):',
+                   '@dev' => 'if(FLAMEPHP_MODE_DEV):',
                    '@enddev' => 'endif',
                    '@debugger' => 'view(".src/:helpers/debugger")',
                    '@svglogo' => 'echo "<svg version=\"1.1\" viewBox=\"0 0 32 32\" xml:space=\"preserve\" xmlns=\"http://www.w3.org/2000/svg\" enable-background=\"new 0 0 32 32\"><path d=\"M27 4H5C3.3 4 2 5.3 2 7v18c0 1.7 1.3 3 3 3h2.8c-.5-1-.8-2-.8-3.1-.1-2.7.7-5.3 2.5-7.5l.3-.4c.8-1 1.6-2 2-3 .2-.6.7-1.1 1.2-1.5 1.2-.8 2.9-.6 3.9.4 1.5 1.6 2.4 3.3 2.7 5 0 .2.1.4.1.6.5-.3 1.1-.5 1.7-.5 1.1 0 2.1.7 2.6 1.7.9 1.9 1.2 4.3.8 6.4-.1.6-.4 1.3-.6 1.8H27c1.7 0 3-1.3 3-3V7c0-1.7-1.3-3-3-3zM7.9 8.4c0 .1-.1.2-.2.3-.2.2-.4.3-.7.3s-.5-.1-.7-.3C6.1 8.5 6 8.3 6 8c0-.3.1-.5.3-.7l.1-.1c.1 0 .1-.1.2-.1.1-.1.1-.1.2-.1h.4c.1 0 .1 0 .2.1.1 0 .1.1.2.1l.1.1c.1.1.2.2.2.3.1.1.1.3.1.4 0 .1 0 .3-.1.4zm2.8.3c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.2-.2-.3-.4-.3-.7 0-.1 0-.3.1-.4.1-.1.1-.2.2-.3.1-.1.2-.2.3-.2.4-.2.8-.1 1.1.2.1.1.2.2.2.3.1.1.1.3.1.4 0 .3-.1.5-.3.7zm3.2-.3c-.1.1-.1.2-.2.3-.2.2-.4.3-.7.3-.1 0-.3 0-.4-.1-.1-.1-.2-.1-.3-.2-.1-.1-.2-.2-.2-.3-.1-.1-.1-.3-.1-.4 0-.1 0-.3.1-.4.1-.1.1-.2.2-.3.4-.4 1-.4 1.4 0 .1.1.2.2.2.3.1.1.1.3.1.4 0 .1 0 .3-.1.4z\" fill=\"#ff595E\" class=\"fill-000000\"></path><path d=\"M22.2 20.7c-.2-.3-.5-.5-.9-.6-.4 0-.7.2-.9.5l-.1.2c0 .1-.1.2-.1.2-.5.7-1.1 1.1-2.1 1.2H18v-.7c-.1-1.1-.1-2.1-.3-3.2-.3-1.4-1-2.7-2.2-4-.3-.3-.9-.4-1.3-.1-.2.1-.4.3-.5.5-.5 1.3-1.3 2.3-2.3 3.5l-.3.4c-1.5 1.9-2.2 4-2.1 6.2.1 3.3 3.3 6.2 6.9 6.2 3.3 0 6.2-2.2 6.9-5.3.4-1.6.2-3.5-.6-5z\" fill=\"#ffca3a\" class=\"fill-000000\"></path></svg>"',
@@ -61,7 +61,7 @@ class FlameRender extends Base {
           $file_ext = $filedata['file_ext'];
 
           // is the parser is required to reParse the file or just parse if not exits curretly
-          if(!file_exists($cached_file) || (MODE_DEV)) {
+          if(!file_exists($cached_file) || (FLAMEPHP_MODE_DEV)) {
                // check if the view file is not exists
                if(!file_exists($view_file)){
                     $ex = new Exception();
@@ -148,8 +148,8 @@ class FlameRender extends Base {
 
      public static function textParser(string $text, array $variable_pack = array(), bool $eval = false, bool $cache_evald_data = false) {
           $textHash = md5($text);
-          flamephp_createPath__(cache('/intimeParser/'));
-          $cfile = cache('/intimeParser' . startStrSlash($textHash . '.text-content.php'));
+          flamephp_createPath__(flamephp_cache('/intimeParser/'));
+          $cfile = flamephp_cache('/intimeParser' . flamephp_startStrSlash($textHash . '.text-content.php'));
           $varPack = '';
           if(!empty($variable_pack)) {
                $varPack = "<?php\n";
@@ -198,9 +198,24 @@ class FlameRender extends Base {
           return $data;
      }
 
+     public static function view($file, array $data = []) {
+          if(str_ends_with($file, '/') || str_ends_with($file, '\\')) $file .= 'index';
+          if(!empty($data)){
+               foreach($data as $var => $vardata){
+                    if(is_string($var)){
+                         ${$var} = $vardata;
+                         $_bag[$var] = $vardata;
+                    } else {
+                         $_bag[] = $vardata;
+                    }
+               }
+          }
+          include self::include($file);
+     }
+
      public static function eval(string $data, bool $cache_evald_data = false) {
           if($cache_evald_data) {
-               $cfile = cache('/intimeParser' . startStrSlash(md5($data) . '.text-data-eval.php'));
+               $cfile = flamephp_cache('/intimeParser' . flamephp_startStrSlash(md5($data) . '.text-data-eval.php'));
                if(file_exists($cfile)) return require $cfile;
           }
           ob_start();
@@ -211,4 +226,15 @@ class FlameRender extends Base {
           return $content;
      }
 
+     public static function ClearCache() {
+          try {
+               flamephp_deleteDir(self::$store_dir);
+          } catch(Exception $e) {
+               echo "Failed to delete cache!\n";
+               echo $e->getMessage();
+               return false;
+          }
+          echo "Cache successfully deleted!\n";
+          return true;
+     }
 }

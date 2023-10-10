@@ -10,9 +10,9 @@ class FlameFileHash extends Base {
      private static array $hashList = [];
 
      public static function boot(): void {
-          flamephp_createPath__(cache('/flame-engine'));
-          if(MODE_DEV) {
-               if(file_exists($file = cache('/flame-engine/hash.php'))) {
+          flamephp_createPath__(flamephp_cache('/flame-engine'));
+          if(FLAMEPHP_MODE_DEV) {
+               if(file_exists($file = flamephp_cache('/flame-engine/hash.php'))) {
                     self::$hashList = require $file;
                }
           }
@@ -32,7 +32,7 @@ class FlameFileHash extends Base {
 
      public static function addFile($hash, $cache_path) {
           self::$hashList[$hash] = $cache_path;
-          file_put_contents(cache('/flame-engine/hash.php'), "<?php\nreturn " . var_export(self::$hashList, true) . ";");
+          file_put_contents(flamephp_cache('/flame-engine/hash.php'), "<?php\nreturn " . var_export(self::$hashList, true) . ";");
      }
 
 }

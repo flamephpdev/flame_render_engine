@@ -18,3 +18,17 @@ echo FlameRender::textParser('
 ', [
      'test' => 'Something...'
 ]);
+
+echo "\n";
+if(php_sapi_name() !== 'cli') echo "<br/>";
+
+echo FlameRender::textParser('
+     And this is how if else statements works
+     @if($ok)
+          The $ok variable is true
+     @else:
+          The $ok variable is false
+     @endif
+', [
+     'ok' => boolval(rand(0, 1))
+], true);

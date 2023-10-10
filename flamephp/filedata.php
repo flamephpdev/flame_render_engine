@@ -13,7 +13,7 @@ class FileData {
             $file = str_replace('.src/:', '', $file);
             $v_p = FLAMEPHP_RENDER_ENGINE_ROOT . ('/template/views');
             $data = require FLAMEPHP_RENDER_ENGINE_ROOT . ('/applock.token.php');
-            $atp = startStrSlash($data['framework_builtin_views_directory']);
+            $atp = flamephp_startStrSlash($data['framework_builtin_views_directory']);
         }
         $file_ext = 'php';
         if(str_contains($file, '.')) {
@@ -23,14 +23,14 @@ class FileData {
             $file = implode('.', $ext);
         }
         $varf = str_replace('{ext}', $file_ext, $view__autorender_file);
-        if(file_exists($v_p . startStrSlash($file) . $varf)) {
-            $view_file = $v_p . startStrSlash($file) . $varf;
-            $cached_file = $store_dir . $atp . startStrSlash($file) . $varf;
+        if(file_exists($v_p . flamephp_startStrSlash($file) . $varf)) {
+            $view_file = $v_p . flamephp_startStrSlash($file) . $varf;
+            $cached_file = $store_dir . $atp . flamephp_startStrSlash($file) . $varf;
             $renderFile = true;
             
         } else {
-            $view_file = $v_p . startStrSlash($file) . '.' . $file_ext;
-            $cached_file = $store_dir . $atp . startStrSlash($file) . '.' . $file_ext;
+            $view_file = $v_p . flamephp_startStrSlash($file) . '.' . $file_ext;
+            $cached_file = $store_dir . $atp . flamephp_startStrSlash($file) . '.' . $file_ext;
         }
         if($file_ext !== 'php' && $renderFile) {
             $cached_file .= '.php';
